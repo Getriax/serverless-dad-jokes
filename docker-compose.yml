@@ -7,7 +7,7 @@ services:
     working_dir: /app
     volumes:
       - .:/app
-    container_name: sls
+    container_name: slsdad
     env_file:
       - .env.docker
     logging:

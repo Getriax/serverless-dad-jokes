@@ -1,14 +1,10 @@
-# NOTE: update this with your service name
-service: slack-mute
+service: twitter-dad-jokes
 
-# Use the serverless-webpack plugin to transpile ES6
 plugins:
   - serverless-webpack
   - serverless-offline
   - serverless-mocha-plugin
 
-# serverless-webpack configuration
-# Enable auto-packing of external modules
 custom:
   webpack:
     webpackConfig: ./webpack.config.js
@@ -23,50 +19,11 @@ provider:
   runtime: nodejs8.10
   region: ${file(./.env.yml):REGION}
   environment: ${file(./.env.yml)}
-  iamRoleStatements:
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}"
-    - Effect: Allow
-      Action:
-        - dynamodb:Query
-        - dynamodb:Scan
-        - dynamodb:GetItem
-        - dynamodb:PutItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}/*/*"
 
 functions:
-  hello:
-    handler: handlers/hello.world
+  dadJoke:
+    handler: handlers/twitter.dadJoke
     events:
-      - http:
-          path: hello
-          method: get
-          cors: true
-
-resources:
-  Resources:
-    TodosDynamoDbTable:
-      Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          -
-            AttributeName: id
-            AttributeType: S
-        KeySchema:
-          -
-            AttributeName: id
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.DYNAMODB_TABLE}
+       - schedule:
+          name: dad-jokes
+          rate: rate(1 hour)
